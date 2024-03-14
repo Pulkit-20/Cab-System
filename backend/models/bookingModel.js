@@ -6,19 +6,27 @@ const bookingSchema = new mongoose.Schema({
     ref: "Passenger",
     required: true,
   },
-  startLocation: {
+  sourceLocation: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Location",
     required: true,
   },
-  endLocation: {
+  destinationLocation: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Location",
     required: true,
+  },
+  travelTime: {
+    type: Number,
+    required: true
+  },
+  estimatedCost: {
+    type: Number,
+    required: true
   },
   bookingDateTime: {
     type: Date,
-    default: () => new Date(Date.now() + 10 * 60 * 1000),
+    default: () => new Date(Date.now() + 10 * 60 * 1000), // 10 mins from current time for "Book Now"
   },
 });
 
