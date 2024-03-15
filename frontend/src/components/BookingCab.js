@@ -6,6 +6,8 @@ import {
   Typography,
   MenuItem,
   Snackbar,
+  SnackbarContent,
+  Alert,
 } from "@mui/material";
 import CabTypeDropdown from "./CabTypeDropdown";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
@@ -15,6 +17,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import StartLocationDropdown from "./dropdowns/StartLocationDropdown";
 import dayjs from "dayjs";
 import EndLocationDropdown from "./dropdowns/EndLocationDropdown";
+import LinearProgress from "@mui/material/LinearProgress";
 
 const BookingCab = () => {
   const [name, setName] = useState("");
@@ -26,16 +29,23 @@ const BookingCab = () => {
   const [selectedCab, setSelectedCab] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const handleBookingSubmit = async () => {
+    setIsSubmitting(true);
     if (!name || !email || !startLocation || !endLocation || !selectedCab) {
+      setIsSubmitting(false);
       setErrorMessage("Please fill in all fields.");
+      setSnackbarSeverity("error");
       setOpenSnackbar(true);
       return;
     }
 
     if (!email.includes("@")) {
+      setIsSubmitting(false);
       setErrorMessage("Email is not valid.");
+      setSnackbarSeverity("error");
       setOpenSnackbar(true);
       return;
     }
@@ -52,11 +62,11 @@ const BookingCab = () => {
           sourceLocationId: startLocation,
           destinationLocationId: endLocation,
           cabId: selectedCab,
-          startTime: date, // Example: current time
         }),
       });
 
       if (!response.ok) {
+        setIsSubmitting(false);
         throw new Error("Failed to book cab.");
       }
 
@@ -67,13 +77,15 @@ const BookingCab = () => {
       setStartLocation("");
       setEndLocation("");
       setSelectedCab("");
-
+      setIsSubmitting(false);
       setOpenSnackbar(true);
       setErrorMessage("Booking successful.");
+      setSnackbarSeverity("success");
     } catch (error) {
       console.error("Error booking cab:", error);
       setOpenSnackbar(true);
-      setErrorMessage("Failed to book cab.");
+      setErrorMessage("This Cab is not available for now.");
+      setSnackbarSeverity("error");
     }
   };
 
@@ -83,7 +95,7 @@ const BookingCab = () => {
   const handleDateChange = (newDate) => {
     setDate(newDate.toDate());
     console.log(newDate.toDate());
-  }
+  };
 
   return (
     <Grid container spacing={2}>
@@ -115,7 +127,9 @@ const BookingCab = () => {
           fullWidth
         >
           <MenuItem value="now">Book Now</MenuItem>
-          <MenuItem value="later" disabled={true}>Schedule for Later(Coming Soon)</MenuItem>
+          <MenuItem value="later" disabled={true}>
+            Schedule for Later(Coming Soon)
+          </MenuItem>
         </TextField>
       </Grid>
       {schedule === "later" && (
@@ -160,12 +174,23 @@ const BookingCab = () => {
       </Grid>
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={6000}
+        autoHideDuration={8000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Typography variant="body2">{errorMessage}</Typography>
+        <Alert
+          severity={snackbarSeverity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {errorMessage}
+        </Alert>
       </Snackbar>
+      {isSubmitting && (
+        <Grid item xs={12}>
+          <LinearProgress />
+        </Grid>
+      )}
     </Grid>
   );
 };

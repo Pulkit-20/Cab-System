@@ -99,6 +99,145 @@ function calculateEstimatedCost(travelTime, cabPricePerMinute) {
   return travelTime * cabPricePerMinute;
 }
 
+// async function isCabAvailable(
+//   cabId,
+//   startTime,
+//   endTime,
+//   sourceLocationId,
+//   destinationLocationId
+// ) {
+//   try {
+//     console.log("Checking cab availability...");
+//     console.log("Cab ID:", cabId);
+//     console.log("Start Time:", startTime);
+//     console.log("End Time:", endTime);
+//     console.log("Source Location ID:", sourceLocationId);
+//     console.log("Destination Location ID:", destinationLocationId);
+
+//     // Find all bookings of the cab that overlap with the provided time slot
+//     const overlappingSchedules = await CabSchedule.find({
+//       cabId: cabId,
+//       $or: [
+//         {
+//           $and: [
+//             { startTime: { $lte: startTime } },
+//             { endTime: { $gte: startTime } },
+//           ],
+//         },
+//         {
+//           $and: [
+//             { startTime: { $lte: endTime } },
+//             { endTime: { $gte: endTime } },
+//           ],
+//         },
+//       ],
+//     });
+
+//     console.log("Overlapping Schedules:", overlappingSchedules);
+
+//     if (overlappingSchedules.length > 0) {
+//       console.log("Cab is not available due to overlapping schedules.");
+//       return false; // Cab is not available due to overlapping schedules
+//     }
+
+//     // Find the current location of the cab
+//     const cabSchedule = await CabSchedule.findOne({ cabId }).sort({
+//       startTime: -1,
+//     });
+
+//     if (!cabSchedule) {
+//       // If no cab schedule is found, assume the cab is available
+//       console.log("Cab is available.");
+//       return true;
+//     }
+
+//     // Calculate the time required to reach the source location
+//     const travelTimeToSource = await dijkstra(
+//       cabSchedule.destinationLocationId,
+//       sourceLocationId
+//     );
+
+//     console.log("Travel time to source:", travelTimeToSource);
+
+//     const timeToReachSource = new Date(
+//       cabSchedule.endTime.getTime() + travelTimeToSource.totalTravelTime * 60000
+//     );
+
+//     if (timeToReachSource > startTime) {
+//       console.log("Cab cannot reach the source location in time.");
+//       return false; // Cab cannot reach the source location in time
+//     }
+
+//     // Calculate the time required to reach the destination location from the source location
+//     const travelTimeToDestination = await dijkstra(
+//       sourceLocationId,
+//       destinationLocationId
+//     );
+
+//     console.log("Travel time to destination:", travelTimeToDestination);
+
+//     // Calculate the end time of the journey considering travel time
+//     const endTimeConsideringTravel = new Date(
+//       endTime.getTime() + travelTimeToDestination.totalTravelTime * 60000
+//     );
+//     console.log("End time considering travel:", endTimeConsideringTravel);
+
+//     if (endTimeConsideringTravel > endTime) {
+//       console.log("Cab cannot reach the destination location in time.");
+//       return false; // Cab cannot reach the destination location in time
+//     }
+
+//     console.log("Cab is available.");
+//     return true; // Cab is available
+//   } catch (error) {
+//     console.error("Error checking cab availability:", error);
+//     return false; // Error occurred, consider cab as unavailable
+//   }
+// }
+
+
+async function trackCabs(req, res) {
+  try {
+    const rides = await Booking.find({});
+    
+    // Separate ongoing and completed rides
+    const ongoingRides = [];
+    const completedRides = [];
+    const now = new Date();
+    
+    for (const ride of rides) {
+      const passenger = await Passenger.findById(ride.passengerId);
+      const startLocation = await Location.findById(ride.sourceLocation);
+      const endLocation = await Location.findById(ride.destinationLocation);
+      const cab = await Cab.findOne({ _id: ride.cabId });
+      
+      const rideInfo = {
+        passengerName: passenger.name,
+        startLocation: startLocation.locationName,
+        endLocation: endLocation.locationName,
+        startTime: ride.bookingDateTime,
+        endTime: ride.endTime,
+        cabType: cab.cabType,
+        cabPrice: ride.estimatedCost,
+        cabPic: cab.cabPic,
+      };
+      
+      if (ride.endTime > now) {
+        ongoingRides.push(rideInfo);
+      } else {
+        
+        completedRides.push(rideInfo);
+      }
+    }
+    
+    res.json({ ongoingRides, completedRides });
+  } catch (err) {
+    res
+    .status(500)
+    .json({ message: "Error retrieving ride information", error: err });
+  }
+}
+
 async function isCabAvailable(
   cabId,
   startTime,
@@ -107,135 +246,37 @@ async function isCabAvailable(
   destinationLocationId
 ) {
   try {
-    console.log("Checking cab availability...");
-    console.log("Cab ID:", cabId);
-    console.log("Start Time:", startTime);
-    console.log("End Time:", endTime);
-    console.log("Source Location ID:", sourceLocationId);
-    console.log("Destination Location ID:", destinationLocationId);
-
-    // Find all bookings of the cab that overlap with the provided time slot
-    const overlappingSchedules = await CabSchedule.find({
-      cabId: cabId,
+    // Check if there is any schedule for the specified cab that overlaps with the given time frame and locations
+    const existingSchedule = await CabSchedule.findOne({
+      cabId,
       $or: [
         {
           $and: [
-            { startTime: { $lte: startTime } },
-            { endTime: { $gte: startTime } },
+            { startTime: { $lt: endTime } }, // Existing schedule ends after requested start time
+            { endTime: { $gt: startTime } }, // Existing schedule starts before requested end time
           ],
+        },
+      ],
+      $or: [
+        {
+          $and: [{ sourceLocationId }, { destinationLocationId }],
         },
         {
           $and: [
-            { startTime: { $lte: endTime } },
-            { endTime: { $gte: endTime } },
+            { sourceLocationId: destinationLocationId },
+            { destinationLocationId: sourceLocationId },
           ],
         },
       ],
     });
 
-    console.log("Overlapping Schedules:", overlappingSchedules);
-
-    if (overlappingSchedules.length > 0) {
-      console.log("Cab is not available due to overlapping schedules.");
-      return false; // Cab is not available due to overlapping schedules
-    }
-
-    // Find the current location of the cab
-    const cabSchedule = await CabSchedule.findOne({ cabId }).sort({
-      startTime: -1,
-    });
-
-    if (!cabSchedule) {
-      // If no cab schedule is found, assume the cab is available
-      console.log("Cab is available.");
-      return true;
-    }
-
-    // Calculate the time required to reach the source location
-    const travelTimeToSource = await dijkstra(
-      cabSchedule.destinationLocationId,
-      sourceLocationId
-    );
-
-    console.log("Travel time to source:", travelTimeToSource);
-
-    const timeToReachSource = new Date(
-      cabSchedule.endTime.getTime() + travelTimeToSource.totalTravelTime * 60000
-    );
-
-    if (timeToReachSource > startTime) {
-      console.log("Cab cannot reach the source location in time.");
-      return false; // Cab cannot reach the source location in time
-    }
-
-    // Calculate the time required to reach the destination location from the source location
-    const travelTimeToDestination = await dijkstra(
-      sourceLocationId,
-      destinationLocationId
-    );
-
-    console.log("Travel time to destination:", travelTimeToDestination);
-
-    // Calculate the end time of the journey considering travel time
-    const endTimeConsideringTravel = new Date(
-      endTime.getTime() + travelTimeToDestination.totalTravelTime * 60000
-    );
-    console.log("End time considering travel:", endTimeConsideringTravel);
-
-    if (endTimeConsideringTravel > endTime) {
-      console.log("Cab cannot reach the destination location in time.");
-      return false; // Cab cannot reach the destination location in time
-    }
-
-    console.log("Cab is available.");
-    return true; // Cab is available
+    // If there is no existing schedule that overlaps, the cab is available
+    return !existingSchedule;
   } catch (error) {
     console.error("Error checking cab availability:", error);
-    return false; // Error occurred, consider cab as unavailable
+    throw error; // Throw error for handling in the calling function
   }
 }
-
-async function trackCabs(req, res) {
-  try {
-    const rides = await Booking.find({});
-
-    // Separate ongoing and completed rides
-    const ongoingRides = [];
-    const completedRides = [];
-    const now = new Date();
-
-    for (const ride of rides) {
-      const passenger = await Passenger.findById(ride.passengerId);
-      const startLocation = await Location.findById(ride.sourceLocation);
-      const endLocation = await Location.findById(ride.destinationLocation);
-      const cab = await Cab.findById(ride.cabId);
-
-      const rideInfo = {
-        passengerName: passenger.name,
-        startLocation: startLocation.locationName,
-        endLocation: endLocation.locationName,
-        startTime: ride.bookingDateTime,
-        endTime: ride.endTime,
-        cabType: cab.cabType,
-        cabPrice: cab.cabPrice,
-        cabPic: cab.cabPic,
-      };
-
-      if (ride.endTime > now) {
-        ongoingRides.push(rideInfo);
-      } else {
-        completedRides.push(rideInfo);
-      }
-    }
-
-    res.json({ ongoingRides, completedRides });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error retrieving ride information", error: err });
-  }
-}
-
 
 
 // Controller function to handle booking requests
@@ -246,11 +287,10 @@ async function bookCab(req, res) {
     sourceLocationId,
     destinationLocationId,
     cabId,
-    startTime,
   } = req.body;
-  
-  let cab = await Cab.findOne({ _id: cabId });
 
+  let cab = await Cab.findOne({ _id: cabId });
+  startTime = Date.now();
   const cabPricePerMinute = cab.cabPrice;
   // Parse startTime from string to a Date object
   let parsedStartTime;

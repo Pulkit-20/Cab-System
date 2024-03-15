@@ -30,6 +30,11 @@ const bookingSchema = new mongoose.Schema({
   endTime: {
     type: Date,
     required: true
+  },
+  cabId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Cab",
+    required: true,
   }
 });
 
