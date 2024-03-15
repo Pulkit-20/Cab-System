@@ -28,5 +28,31 @@ async function fetchCabs(req, res) {
     res.status(500).json({ message: 'Error fetching cabs', error: error.message });
   }
 }
+async function editCab(req, res) {
+  try {
+    const cabId = req.params.id; 
+    const { cabType, cabPrice, cabPic } = req.body;
 
-module.exports = { addCab, fetchCabs};
+    // Check if the cab exists
+    const cab = await Cab.findById(cabId);
+    if (!cab) {
+      return res.status(404).json({ message: "Cab not found" });
+    }
+
+    // Update cab details
+    cab.cabType = cabType;
+    cab.cabPrice = cabPrice;
+    cab.cabPic = cabPic;
+
+    // Save the updated cab
+    await cab.save();
+
+    res.status(200).json({ message: "Cab updated successfully", cab });
+  } catch (error) {
+    console.error("Error editing cab:", error);
+    res
+      .status(500)
+      .json({ message: "Error editing cab", error: error.message });
+  }
+}
+module.exports = { addCab, fetchCabs, editCab};
