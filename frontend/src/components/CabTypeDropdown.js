@@ -1,21 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { TextField, MenuItem } from "@mui/material";
+import axios from "axios";
+import { Avatar, ListItemAvatar } from "@mui/material";
 
 const CabTypeDropdown = ({ selectedCab, setSelectedCab }) => {
-  const cabTypes = [
-    {
-      value: "type1",
-      label: "Cab Type 1",
-      pricePerMinute: 0.5,
-      image: "url_to_image",
-    },
-    {
-      value: "type2",
-      label: "Cab Type 2",
-      pricePerMinute: 0.6,
-      image: "url_to_image",
-    },
-  ];
+  const [cabTypes, setCabTypes] = useState([]);
+
+  useEffect(() => {
+    const fetchCabTypes = async () => {
+      try {
+        const response = await axios.get("/cab");
+        if (Array.isArray(response.data)) {
+          setCabTypes(response.data);
+        } else {
+          console.error("Invalid cab types data:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching cab types:", error);
+      }
+    };
+
+    fetchCabTypes();
+  }, []);
 
   return (
     <TextField
@@ -26,8 +32,11 @@ const CabTypeDropdown = ({ selectedCab, setSelectedCab }) => {
       fullWidth
     >
       {cabTypes.map((cab) => (
-        <MenuItem key={cab.value} value={cab.value}>
-          {cab.label} - ${cab.pricePerMinute.toFixed(2)}/min
+        <MenuItem key={cab._id} value={cab._id}>
+          <ListItemAvatar>
+            <Avatar alt={cab.cabType} src={cab.cabPic} />
+          </ListItemAvatar>
+          {cab.cabType} - ₹{cab.cabPrice.toFixed(2)}/min
         </MenuItem>
       ))}
     </TextField>

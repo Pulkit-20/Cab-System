@@ -2,13 +2,11 @@ const mongoose = require("mongoose");
 
 // Adjacency schema
 const adjacencySchema = new mongoose.Schema({
-  locationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Location",
+  adjLocationName: {
+    type: String,
   },
   timeInMinutes: {
     type: Number,
-    required: true,
   },
 });
 
