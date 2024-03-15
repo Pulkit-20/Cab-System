@@ -195,22 +195,21 @@ function calculateEstimatedCost(travelTime, cabPricePerMinute) {
 //   }
 // }
 
-
 async function trackCabs(req, res) {
   try {
     const rides = await Booking.find({});
-    
+
     // Separate ongoing and completed rides
     const ongoingRides = [];
     const completedRides = [];
     const now = new Date();
-    
+
     for (const ride of rides) {
       const passenger = await Passenger.findById(ride.passengerId);
       const startLocation = await Location.findById(ride.sourceLocation);
       const endLocation = await Location.findById(ride.destinationLocation);
       const cab = await Cab.findOne({ _id: ride.cabId });
-      
+
       const rideInfo = {
         passengerName: passenger.name,
         startLocation: startLocation.locationName,
@@ -221,53 +220,29 @@ async function trackCabs(req, res) {
         cabPrice: ride.estimatedCost,
         cabPic: cab.cabPic,
       };
-      
+
       if (ride.endTime > now) {
         ongoingRides.push(rideInfo);
       } else {
-        
         completedRides.push(rideInfo);
       }
     }
-    
+
     res.json({ ongoingRides, completedRides });
   } catch (err) {
     res
-    .status(500)
-    .json({ message: "Error retrieving ride information", error: err });
+      .status(500)
+      .json({ message: "Error retrieving ride information", error: err });
   }
 }
 
-async function isCabAvailable(
-  cabId,
-  startTime,
-  endTime,
-  sourceLocationId,
-  destinationLocationId
-) {
+async function isCabAvailable(cabId, startTime, endTime) {
   try {
-    // Check if there is any schedule for the specified cab that overlaps with the given time frame and locations
+    // Check if there is any schedule for the specified cab that overlaps with the given time frame
     const existingSchedule = await CabSchedule.findOne({
       cabId,
-      $or: [
-        {
-          $and: [
-            { startTime: { $lt: endTime } }, // Existing schedule ends after requested start time
-            { endTime: { $gt: startTime } }, // Existing schedule starts before requested end time
-          ],
-        },
-      ],
-      $or: [
-        {
-          $and: [{ sourceLocationId }, { destinationLocationId }],
-        },
-        {
-          $and: [
-            { sourceLocationId: destinationLocationId },
-            { destinationLocationId: sourceLocationId },
-          ],
-        },
-      ],
+      startTime: { $lt: endTime }, // Check if the existing schedule's end time is after the requested start time
+      endTime: { $gt: startTime }, // Check if the existing schedule's start time is before the requested end time
     });
 
     // If there is no existing schedule that overlaps, the cab is available
@@ -277,7 +252,6 @@ async function isCabAvailable(
     throw error; // Throw error for handling in the calling function
   }
 }
-
 
 // Controller function to handle booking requests
 async function bookCab(req, res) {
@@ -327,9 +301,7 @@ async function bookCab(req, res) {
     const isAvailable = await isCabAvailable(
       cabId,
       parsedStartTime,
-      parsedEndTime,
-      sourceLocationId,
-      destinationLocationId
+      parsedEndTime
     );
 
     if (!isAvailable) {
