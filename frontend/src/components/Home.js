@@ -3,7 +3,6 @@ import { Box, Tab } from "@mui/material";
 import { TabList, TabContext, TabPanel } from "@mui/lab";
 import BookingCab from "./BookingCab";
 import UpcomingCabs from "./UpcomingCabs";
-import History from "./History";
 
 export default function LabTabs() {
   const [value, setValue] = React.useState("1");
@@ -19,7 +18,6 @@ export default function LabTabs() {
           <TabList onChange={handleChange} aria-label="lab API tabs example">
             <Tab label="Book Cab" value="1" />
             <Tab label="Track" value="2" />
-            <Tab label="History" value="3" />
           </TabList>
         </Box>
         <TabPanel value="1">
@@ -27,9 +25,6 @@ export default function LabTabs() {
         </TabPanel>
         <TabPanel value="2">
           <UpcomingCabs />
-        </TabPanel>
-        <TabPanel value="3">
-          <History />
         </TabPanel>
       </TabContext>
     </Box>

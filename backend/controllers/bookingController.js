@@ -195,6 +195,28 @@ async function isCabAvailable(
   }
 }
 
+async function trackCabs(req, res) {
+  try {
+    const rides = await Booking.find({});
+
+    // Separate ongoing and completed rides
+    const ongoingRides = [];
+    const completedRides = [];
+    const now = new Date();
+    rides.forEach(ride => {
+      if (ride.endTime > now) {
+        ongoingRides.push(ride);
+      } else {
+        completedRides.push(ride);
+      }
+    });
+
+    res.json({ ongoingRides, completedRides });
+  } catch (err) {
+    res.status(500).json
+  }
+}
+
 
 // Controller function to handle booking requests
 async function bookCab(req, res) {
@@ -298,4 +320,4 @@ async function bookCab(req, res) {
   }
 }
 
-module.exports = { bookCab };
+module.exports = { bookCab, trackCabs };

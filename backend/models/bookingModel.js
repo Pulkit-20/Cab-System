@@ -26,7 +26,6 @@ const bookingSchema = new mongoose.Schema({
   },
   bookingDateTime: {
     type: Date,
-    default: () => new Date(Date.now() + 10 * 60 * 1000), // 10 mins from current time for "Book Now"
   },
   endTime: {
     type: Date,

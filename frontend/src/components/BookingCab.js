@@ -20,6 +20,7 @@ const BookingCab = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [schedule, setSchedule] = useState("");
+  const [date, setDate] = useState("");
   const [startLocation, setStartLocation] = useState("");
   const [endLocation, setEndLocation] = useState("");
   const [selectedCab, setSelectedCab] = useState("");
@@ -51,7 +52,7 @@ const BookingCab = () => {
           sourceLocationId: startLocation,
           destinationLocationId: endLocation,
           cabId: selectedCab,
-          startTime: new Date().toISOString(), // Example: current time
+          startTime: date, // Example: current time
         }),
       });
 
@@ -79,6 +80,10 @@ const BookingCab = () => {
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
+  const handleDateChange = (newDate) => {
+    setDate(newDate.toDate());
+    console.log(newDate.toDate());
+  }
 
   return (
     <Grid container spacing={2}>
@@ -110,7 +115,7 @@ const BookingCab = () => {
           fullWidth
         >
           <MenuItem value="now">Book Now</MenuItem>
-          <MenuItem value="later">Schedule for Later</MenuItem>
+          <MenuItem value="later" disabled={true}>Schedule for Later(Coming Soon)</MenuItem>
         </TextField>
       </Grid>
       {schedule === "later" && (
@@ -119,8 +124,8 @@ const BookingCab = () => {
             <DemoContainer components={["DateTimePicker"]}>
               <DateTimePicker
                 label="Controlled picker"
-                value={schedule}
-                onChange={(newValue) => setSchedule(newValue)}
+                value={date}
+                onChange={handleDateChange}
               />
             </DemoContainer>
           </LocalizationProvider>
