@@ -6,7 +6,6 @@ import {
   Typography,
   MenuItem,
   Snackbar,
-  SnackbarContent,
   Alert,
 } from "@mui/material";
 import CabTypeDropdown from "./CabTypeDropdown";

@@ -13,6 +13,7 @@ import {
   Snackbar,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import MuiAlert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -139,6 +140,29 @@ const EditCabs = () => {
     }
   };
 
+  const handleAddCab = async () => {
+    setLoading(true);
+    try {
+      // Perform the add cab functionality
+      const response = await axios.post("/cab/add", {
+        cabType: newCabType,
+        cabPrice: newCabPrice,
+        cabPic: newCabPic,
+      });
+
+      // Add the new cab to the existing list
+      setCabs([...cabs, response.data.cab]);
+
+      handleSnackbarOpen("Cab added successfully!", "success");
+    } catch (error) {
+      console.error("Error adding cab:", error);
+      handleSnackbarOpen("Failed to add cab. Please try again!", "error");
+    } finally {
+      setLoading(false);
+      handleDialogClose(); // Close the dialog after adding cab
+    }
+  };
+
   return (
     <>
       {loading && (
@@ -173,6 +197,22 @@ const EditCabs = () => {
                 </Card>
               </Grid>
             ))}
+            <Grid item xs={12} sm={6} md={4} lg={3}>
+              <Card
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                }}
+                onClick={() => setOpenDialog(true)}
+              >
+                <CardContent>
+                  <AddIcon style={{ fontSize: 60 }} />
+                  <div>Add Cab</div>
+                </CardContent>
+              </Card>
+            </Grid>
           </Grid>
 
           <Dialog open={openDialog} onClose={handleDialogClose}>
@@ -183,7 +223,7 @@ const EditCabs = () => {
                 value={newCabType}
                 onChange={(e) => setNewCabType(e.target.value)}
                 fullWidth
-                style={{ marginBottom: "20px" }}
+                style={{ marginBottom: "20px", marginTop: "20px" }}
               />
               <TextField
                 label="Cab Price"
@@ -201,10 +241,10 @@ const EditCabs = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleSaveChanges}
+                onClick={selectedCab ? handleSaveChanges : handleAddCab}
                 style={{ marginTop: "10px" }}
               >
-                Save Changes
+                {selectedCab ? "Save Changes" : "Add Cab"}
               </Button>
             </DialogContent>
           </Dialog>
