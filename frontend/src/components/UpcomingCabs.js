@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import { Box, Card, CardContent, Typography, CardMedia } from "@mui/material";
 import axios from "axios";
 
 const UpcomingCabs = () => {
@@ -28,8 +28,32 @@ const UpcomingCabs = () => {
         <Card key={index} sx={{ border: "2px solid blue", mb: 2 }}>
           <CardContent>
             <Typography variant="body2" color="text.secondary">
-              Cab Timing: {ride.bookingDateTime} - {ride.endTime}
+              Passenger: {ride.passengerName}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Start Location: {ride.startLocation}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              End Location: {ride.endLocation}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Start Time: {ride.startTime}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              End Time: {ride.endTime}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Cab Name: {ride.cabType}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Cab Price: {ride.cabPrice}
+            </Typography>
+            <CardMedia
+              component="img"
+              height="140"
+              image={ride.cabPic}
+              alt="Cab"
+            />
           </CardContent>
         </Card>
       ))}
@@ -41,8 +65,32 @@ const UpcomingCabs = () => {
         <Card key={index} sx={{ border: "2px solid green", mb: 2 }}>
           <CardContent>
             <Typography variant="body2" color="text.secondary">
-              Cab Timing: {ride.bookingDateTime} - {ride.endTime}
+              Passenger: {ride.passengerName}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Start Location: {ride.startLocation}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              End Location: {ride.endLocation}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Start Time: {ride.startTime}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              End Time: {ride.endTime}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Cab Name: {ride.cabType}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Cab Price: {ride.cabPrice}
+            </Typography>
+            <CardMedia
+              component="img"
+              height="140"
+              image={ride.cabPic}
+              alt="Cab"
+            />
           </CardContent>
         </Card>
       ))}

@@ -203,19 +203,39 @@ async function trackCabs(req, res) {
     const ongoingRides = [];
     const completedRides = [];
     const now = new Date();
-    rides.forEach(ride => {
+
+    for (const ride of rides) {
+      const passenger = await Passenger.findById(ride.passengerId);
+      const startLocation = await Location.findById(ride.sourceLocation);
+      const endLocation = await Location.findById(ride.destinationLocation);
+      const cab = await Cab.findById(ride.cabId);
+
+      const rideInfo = {
+        passengerName: passenger.name,
+        startLocation: startLocation.locationName,
+        endLocation: endLocation.locationName,
+        startTime: ride.bookingDateTime,
+        endTime: ride.endTime,
+        cabType: cab.cabType,
+        cabPrice: cab.cabPrice,
+        cabPic: cab.cabPic,
+      };
+
       if (ride.endTime > now) {
-        ongoingRides.push(ride);
+        ongoingRides.push(rideInfo);
       } else {
-        completedRides.push(ride);
+        completedRides.push(rideInfo);
       }
-    });
+    }
 
     res.json({ ongoingRides, completedRides });
   } catch (err) {
-    res.status(500).json
+    res
+      .status(500)
+      .json({ message: "Error retrieving ride information", error: err });
   }
 }
+
 
 
 // Controller function to handle booking requests
