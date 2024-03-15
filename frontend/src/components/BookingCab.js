@@ -9,12 +9,12 @@ import {
   Alert,
 } from "@mui/material";
 import CabTypeDropdown from "./CabTypeDropdown";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+// import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+// import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import StartLocationDropdown from "./dropdowns/StartLocationDropdown";
-import dayjs from "dayjs";
+// import dayjs from "dayjs";
 import EndLocationDropdown from "./dropdowns/EndLocationDropdown";
 import LinearProgress from "@mui/material/LinearProgress";
 
@@ -131,19 +131,19 @@ const BookingCab = () => {
           </MenuItem>
         </TextField>
       </Grid>
-      {schedule === "later" && (
-        <Grid item xs={12}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer components={["DateTimePicker"]}>
-              <DateTimePicker
-                label="Controlled picker"
-                value={date}
-                onChange={handleDateChange}
-              />
-            </DemoContainer>
-          </LocalizationProvider>
-        </Grid>
-      )}
+      {schedule === "later" 
+        // <Grid item xs={12}>
+        //   <LocalizationProvider dateAdapter={AdapterDayjs}>
+        //     <DemoContainer components={["DateTimePicker"]}>
+        //       <DateTimePicker
+        //         label="Controlled picker"
+        //         value={date}
+        //         onChange={handleDateChange}
+        //       />
+        //     </DemoContainer>
+        //   </LocalizationProvider>
+        // </Grid>
+      }
       <Grid item xs={12}>
         <StartLocationDropdown
           startLocation={startLocation}
