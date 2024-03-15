@@ -67,5 +67,16 @@ const addLocation = async (req, res) => {
       .json({ message: "Error adding location", error: error.message });
   }
 };
+async function fetchLocations(req, res) {
+  try {
+    const locations = await Location.find();
+    res.status(200).json(locations);
+  } catch (error) {
+    console.error("Error fetching locations:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching locations", error: error.message });
+  }
+}
 
-module.exports = { addLocation };
+module.exports = { addLocation, fetchLocations };

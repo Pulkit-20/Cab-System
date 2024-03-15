@@ -1,4 +1,5 @@
-const Cab = require("../models/cabModel");
+const Cab = require("../models/cabModel"); 
+const Booking = require("../models/bookingModel");
 
 async function addCab(req, res) {
   try {
@@ -27,4 +28,5 @@ async function fetchCabs(req, res) {
     res.status(500).json({ message: 'Error fetching cabs', error: error.message });
   }
 }
-module.exports = { addCab, fetchCabs };
+
+module.exports = { addCab, fetchCabs};
