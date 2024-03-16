@@ -22,7 +22,6 @@ const BookingCab = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [schedule, setSchedule] = useState("");
-  const [date, setDate] = useState("");
   const [startLocation, setStartLocation] = useState("");
   const [endLocation, setEndLocation] = useState("");
   const [selectedCab, setSelectedCab] = useState("");
@@ -77,6 +76,32 @@ const BookingCab = () => {
       setEndLocation("");
       setSelectedCab("");
       setIsSubmitting(false);
+
+      const message = `Dear ${name},
+
+        Your booking has been confirmed. Here are the details of your cab:
+
+        Passenger Name: ${name}
+        Thank you for choosing our cab service. If you have any further questions or need assistance, feel free to contact us.
+
+        Best regards,
+        CritX Cab Services
+        `;
+      const emailResponse = await fetch("/email/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recipientEmail: email,
+          subject: "Booking Confirmation",
+          message: message,
+        }),
+      });
+
+      if (!emailResponse.ok) {
+        throw new Error("Failed to send email.");
+      }
       setOpenSnackbar(true);
       setErrorMessage("Booking successful.");
       setSnackbarSeverity("success");
@@ -90,10 +115,6 @@ const BookingCab = () => {
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
-  };
-  const handleDateChange = (newDate) => {
-    setDate(newDate.toDate());
-    console.log(newDate.toDate());
   };
 
   return (
@@ -131,7 +152,8 @@ const BookingCab = () => {
           </MenuItem>
         </TextField>
       </Grid>
-      {schedule === "later" 
+      {
+        schedule === "later"
         // <Grid item xs={12}>
         //   <LocalizationProvider dateAdapter={AdapterDayjs}>
         //     <DemoContainer components={["DateTimePicker"]}>

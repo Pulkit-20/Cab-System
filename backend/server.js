@@ -1,11 +1,11 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const bookCabRoutes = require("./routes/bookCabRoutes");
 const cabRoutes = require("./routes/cabRoutes");
 const locationRoutes = require("./routes/locationRoutes");
 const path = require("path");
+const emailRoutes = require("./routes/emailRoutes");
 
 dotenv.config();
 connectDB();
@@ -16,6 +16,7 @@ app.use(express.json());
 app.use("/book", bookCabRoutes);
 app.use("/cab", cabRoutes);
 app.use("/location", locationRoutes);
+app.use("/email", emailRoutes);
 
 // Deployement
 

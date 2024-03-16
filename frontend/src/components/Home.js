@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Box, Tab } from "@mui/material";
+import { Box, Tab, Typography } from "@mui/material";
 import { TabList, TabContext, TabPanel } from "@mui/lab";
 import BookingCab from "./BookingCab";
 import UpcomingCabs from "./UpcomingCabs";
@@ -13,7 +13,23 @@ export default function LabTabs() {
   };
 
   return (
-    <Box sx={{ width: "100%", typography: "body1" }}>
+    <Box
+      sx={{
+        width: "100%",
+        typography: "body1",
+        marginBottom: "40px",
+        marginTop: "20px",
+      }}
+    >
+      <Typography
+        variant="h3"
+        align="center"
+        fontWeight="bold"
+        marginBottom="10px"
+        sx={{ color: "purple", fontFamily: "Comic Sans MS, sans-serif" }}
+      >
+        Cab-System
+      </Typography>
       <TabContext value={value}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <TabList onChange={handleChange} aria-label="lab API tabs example">
