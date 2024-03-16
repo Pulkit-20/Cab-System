@@ -82,6 +82,7 @@ const BookingCab = () => {
         Your booking has been confirmed. Here are the details of your cab:
 
         Passenger Name: ${name}
+
         Thank you for choosing our cab service. If you have any further questions or need assistance, feel free to contact us.
 
         Best regards,
