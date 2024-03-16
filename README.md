@@ -1,11 +1,11 @@
 # Cab System
 
-Cab System is a web application built using the MERN (MongoDB, Express.js, React.js, Node.js) stack. It serves as a platform where an admin can book cabs for customers. The application implements Dijkstra's algorithm for finding the shortest path between locations.
+Cab System is a web application built using the MERN (MongoDB, Express.js, React.js, Node.js) stack. The application implements Dijkstra's algorithm for finding the shortest path between locations.
 
 ## Features
 - Admin can book cabs for customers.
 - Dijkstra's algorithm is used to find the shortest path between locations.
-- Customers can track upcoming cabs.
+- Admin can track cabs.
 - Admin can edit cab details.
 
 ## Technologies Used
